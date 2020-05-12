@@ -55,22 +55,22 @@ const Option = Select.Option;
                                               
                                               <FormItem {...formItemLayout} label="红包金额" required>            
                                                   <Select allowClear value={item.interestLevel.value} labelInValue placeholder={item.interestLevel.typetext}  onChange={(value)=>t.props.parenthandleSelectCommon(value,'interestLevel',index)}>
-                                                      {item.interestLevel.source.map(d => <Option key={d.value}>{d.key}</Option>)}
+                                                      {item.interestLevel.source.map(d => <Option key={d.key}>{d.label}</Option>)}
                                                   </Select>   
                                                   </FormItem>
                                                   <FormItem {...formItemLayout} label="变现金额" required>            
                                                   <Select allowClear value={item.minAmount.value} labelInValue placeholder={item.minAmount.typetext}  onChange={(value)=>t.props.parenthandleSelectCommon(value,'minAmount',index)}>
-                                                      {item.minAmount.source.map(d => <Option key={d.value}>{d.key}</Option>)}
+                                                      {item.minAmount.source.map(d => <Option key={d.key}>{d.label}</Option>)}
                                                   </Select>   
                                                   </FormItem>
                                                    <FormItem {...formItemLayout} label="适用产品和期限" required>            
                                                   <Select allowClear value={item.productDate.value} labelInValue placeholder={item.productDate.typetext}  onChange={(value)=>t.props.parenthandleSelectCommon(value,'productDate',index)}>
-                                                      {item.productDate.source.map(d => <Option key={d.value}>{d.key}</Option>)}
+                                                      {item.productDate.source.map(d => <Option key={d.key}>{d.label}</Option>)}
                                                   </Select>   
                                                   </FormItem>
                                                    <FormItem {...formItemLayout} label="有效期" required>            
                                                   <Select allowClear value={item.validityPeriod.value} labelInValue placeholder={item.validityPeriod.typetext}  onChange={(value)=>t.props.parenthandleSelectCommon(value,'validityPeriod',index)}>
-                                                      {item.validityPeriod.source.map(d => <Option key={d.value}>{d.key}</Option>)}
+                                                      {item.validityPeriod.source.map(d => <Option key={d.key}>{d.label}</Option>)}
                                                   </Select>   
                                                   </FormItem>
                                                   

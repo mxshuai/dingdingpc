@@ -10,6 +10,7 @@ const context = nattyFetch.context({
   // jsonp: true,
   withCredentials: false,
   traditional: true,
+  //header: {'Content-Type': 'application/json'},
   //data: {
    // _tb_token_: '',
   //},
@@ -80,6 +81,13 @@ context.create('SomeModuleAPI', {
   submit: {
     mockUrl: 'query/redjson.json',
     url: '/act_web/actdingding/v1/01',
+    data:{},
+    
+  },
+    submitBatch: {
+    mockUrl: 'query/redjson.json',
+    url: '/act_web/actdingding/v1/07',
+    header: {'Content-Type': 'application/json'},
     data:{},
     
   },

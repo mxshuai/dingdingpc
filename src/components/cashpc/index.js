@@ -37,14 +37,15 @@ export default class reditem extends Component {
 
     //this.setState({ fileList })
 
-
+console.log(file)
   
     if(file.status=="done"||file.status=="error"){
-
+  
 
             if(file.response){
 
               if(file.response.code=="200"){
+                this.setState({ fileList }) 
                let photo={name:file.name,url:file.response.data};
 
                 this.state.photoList.push(photo)
@@ -52,6 +53,7 @@ export default class reditem extends Component {
              
               }else{
 
+ console.log(file.response.message)
                  alert({
                       message: file.response.message,
                       title: "提示",//可传空
@@ -67,6 +69,7 @@ export default class reditem extends Component {
                 
               }
               }else{
+                console.log("上传失败")
                  alert({
                       message:"上传失败",
                       title: "提示",//可传空
@@ -82,13 +85,15 @@ export default class reditem extends Component {
               }
             
              
+          }else if(file.status=="removed"){
+  this.setState({ fileList }) 
+              this.state.photoList=[]
           }else{
-
-             //this.setState({ fileList })
+             this.setState({ fileList }) 
           }
    
 
-      this.setState({ fileList }) 
+    // this.setState({ fileList }) 
    
    
  }   

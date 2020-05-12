@@ -20,8 +20,8 @@ export default {
 
     for(var item in realajaxdata.data){//遍历json对象的每个key/value对,p为key
           let temp={};
-          temp.key=realajaxdata.data[item]
-          temp.value=item
+          temp.label=realajaxdata.data[item]
+          temp.key=item
           ajaxdata.department.source.push(temp) 
                
         }
@@ -31,7 +31,7 @@ export default {
   },
   async getActivityId({ fn, setState },ajaxdata) {
     //console.log(ajaxdata.department)
-    console.log(ajaxdata.reqType)
+    //console.log(ajaxdata.reqType)
     const postdata={"deptment":ajaxdata.department.value.key,"reqType":ajaxdata.reqType};
     
     const realajaxdata  = await fn.DB.SomeModuleAPI.getActivityId(postdata);
@@ -44,8 +44,8 @@ export default {
     //const realajaxdata={"data":[{"id":5,"deptment":"101","activityId":206,"createtime":null,"updatetime":null,"flag":null,"operateuser":null,"deptName":"运营部门","activityTitle":"钉钉审批测试","activityBeginTime":1570001163,"activityEndTime":1571210765,"activityStatus":4},{"id":7,"deptment":"101","activityId":101,"createtime":null,"updatetime":null,"flag":null,"operateuser":null,"deptName":"运营部门","activityTitle":"翼龙汇会员招募","activityBeginTime":1495590743,"activityEndTime":1577843567,"activityStatus":4},{"id":3,"deptment":"101","activityId":94,"createtime":null,"updatetime":null,"flag":null,"operateuser":null,"deptName":"运营部门","activityTitle":"加息券活动","activityBeginTime":1491036149,"activityEndTime":1577384152,"activityStatus":4},{"id":1,"deptment":"101","activityId":28,"createtime":null,"updatetime":null,"flag":null,"operateuser":null,"deptName":"运营部门","activityTitle":"生日红包活动","activityBeginTime":1469013363,"activityEndTime":1609430399,"activityStatus":4}]};
      realajaxdata.data.forEach((item) => {
             let temp={};
-            temp.key=item.activityTitle
-            temp.value=item.activityId
+            temp.label=item.activityTitle
+            temp.key=item.activityId
             ajaxdata.activityName.source.push(temp) 
             //console.log(temp.value)
             // let {interestLevel}=basicJSON
@@ -143,29 +143,29 @@ export default {
             let tempprams='';
             if(prams=='activityName'||prams=='rewardType'){
 
-               temp.key=item.value//activityName   选择活动之后确定金额 
-               temp.value=item.value
+               temp.label=item.value//activityName   选择活动之后确定金额 
+               temp.key=item.value
                tempprams='interestLevel'
                ajaxdata["list"][index][tempprams]["source"].push(temp)       
                                                  
               }else if(prams=='interestLevel'){
 
-                temp.key=item.activateBalance//interestLevel  选择金额之后确定起投金额
-                temp.value=item.activateBalance
+                temp.label=item.activateBalance//interestLevel  选择金额之后确定起投金额
+                temp.key=item.activateBalance
                 tempprams='minAmount'
                 ajaxdata["list"][index][tempprams]["source"].push(temp)      
   
               }else if(prams=='minAmount'){
 
-                temp.key=item.realizationProStr//minAmount    选择起投金额之后确定适用产品
-                temp.value=item.realizationPro
+                temp.label=item.realizationProStr//minAmount    选择起投金额之后确定适用产品
+                temp.key=item.realizationPro
                 tempprams='productDate'
                 ajaxdata["list"][index][tempprams]["source"].push(temp)      
                          
               }else if(prams=='productDate'){
 
-                 temp.key=item.validityDays//productDate       选择适用产品之后确定有效期
-                 temp.value=item.validityDays
+                 temp.label=item.validityDays//productDate       选择适用产品之后确定有效期
+                 temp.key=item.validityDays
                  tempprams='validityPeriod'
                  ajaxdata["list"][index][tempprams]["source"].push(temp)      
                
@@ -194,7 +194,7 @@ export default {
           totaldata.rewardId=ajaxdata.list[0].id;
           totaldata.rewardTypeName=ajaxdata.rewardType.value.label;//申请类型名称（中文）
           totaldata.type=ajaxdata.rewardType.value.key;
-          totaldata.sendType=ajaxdata.SingleOrBatch.value.value;
+          totaldata.sendType=ajaxdata.SingleOrBatch.value.key;
           totaldata.mobile=ajaxdata.singledata.userPhone.default;
           totaldata.applyUser=ajaxdata.applyName;//申请人
           totaldata.username=ajaxdata.singledata.userName.default;//客户姓名
@@ -230,7 +230,92 @@ export default {
     const result  = await fn.DB.SomeModuleAPI.submit(totaldata);
    
     setState({ loaded: true,isrender: true});
-    if(result.code!="0000"){
+    if(result.code!="200"){
+      alert({
+          message: result.message,
+          title: "提示",//可传空
+          buttonName: "确定",
+          onSuccess : function() {
+              //onSuccess将在点击button之后回调
+              /*回调*/
+          },
+          onFail : function(err) {}
+      });      
+    }else{  
+      alert({
+          message: "提交成功",
+          title: "提示",//可传空
+          buttonName: "确定",
+          onSuccess : function() {
+               close({})
+          },
+          onFail : function(err) {}
+      }); 
+
+      
+    }
+    //alert(JSON.stringify(result))
+    
+  },
+   async submitBatch({ fn, setState },ajaxdata) {
+    console.log(ajaxdata)
+    const totaldata={};
+
+          totaldata.applyDeptName=ajaxdata.department.value.label;//申请部门名称（中文）
+          totaldata.activityName=ajaxdata.activityName.value.label;//所选活动名称（中文）
+          totaldata.activityId=ajaxdata.activityName.value.key;
+          
+          //totaldata.rewardTypeName=ajaxdata.rewardType.value.label;//申请类型名称（中文）
+          totaldata.type=ajaxdata.rewardType.value.key;
+          totaldata.sendType=ajaxdata.SingleOrBatch.value.key;
+
+          totaldata.applyUser=ajaxdata.applyName;//申请人
+
+          totaldata.description=ajaxdata.singledata.applyReason.default;//申请原因
+
+          totaldata.batchPrizeVOList =[];
+
+          ajaxdata.list.forEach((item) => {
+
+          let tempobj={};
+
+          tempobj.rewardId=item.id;
+
+          tempobj.prizeRate=item.interestLevel.value.key;
+          //totaldata.activateBalanceName=ajaxdata.list[0].minAmount.value.label;//变现/激活金额名称(含中文) 例： 20万
+
+          tempobj.prizeMinAmont=item.minAmount.value.key;
+          //totaldata.realizationProName=ajaxdata.list[0].productDate.value.label;//适用产品和期限名称中文
+
+          tempobj.realizationProName=item.productDate.value.label;
+
+          tempobj.validityDays=item.validityPeriod.value.key;
+          
+          tempobj.count=item.applyNum.value.key;//申请张数
+          tempobj.customerExcelVOList=item.photoList;
+
+          totaldata.batchPrizeVOList.push(tempobj);
+
+          })
+
+
+          
+
+
+
+          totaldata.upperserialnumber=ajaxdata.dingcode;//钉钉流水号
+          
+      
+    //const totaldata={"activityId":"206","rewardId":750,"type":"1","mobile":"111111","applyUser":"aaaaaa",
+    //"balance":"1","activateBalance":"100","realizationPro":",y30,y90,y180,y365,tc30,tc90,yp1,yp3,yp6,yp12,",
+    //"validityDays":"5","upperserialnumber":"111"}
+    //console.log(totaldata)
+    console.log(totaldata)
+
+    const result  = await fn.DB.SomeModuleAPI.submitBatch(totaldata);
+   
+    setState({ loaded: true,isrender: true});
+    if(result.code!="200"){
       alert({
           message: result.message,
           title: "提示",//可传空

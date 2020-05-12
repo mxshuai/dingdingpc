@@ -54,15 +54,15 @@ export default class Page extends Component {
                         "icon":true,
                         "errtxt":"",
                         "source":[{
-                                "value":"1",
-                                "key": "红包"
+                                "key":"1",
+                                "label": "红包"
                             }, 
                             {
-                                "value":"3",
-                                "key": "加息券"
+                                "key":"3",
+                                "label": "加息券"
                             },{
-                                "value":"5",
-                                "key": "现金奖励"
+                                "key":"5",
+                                "label": "现金奖励"
                             }]
                     },                                                                 
                     "list":[statebasicJSON],
@@ -86,16 +86,16 @@ export default class Page extends Component {
 
                      "SingleOrBatch":{
                     "source": [{
-                                "value":"1",
-                                "key": "单张发放"
+                                "key":"1",
+                                "label": "单张发放"
                             }, 
                             {
-                                "value":"2",
-                                "key": "批量发放"
+                                "key":"2",
+                                "label": "批量发放"
                             }],
                       "value":{
-                                "value":"1",
-                                "key": "单张发放"
+                                "key":"1",
+                                "label": "单张发放"
                             },
                       "typetext":"单张发放",
 
@@ -110,20 +110,6 @@ export default class Page extends Component {
   }
  
   componentDidMount() {
-   // this.dispatch('update')
-//console.log(this.props)
-  //this.dispatch('submit',this.state.ajaxdata);
-    //设置加载组件
-     /*if(this.props.route.path=="interest"){
-           let obj={...this.state};
-           obj['ajaxdata']['rewardType']=3;
-           obj['ajaxdata']['rewardTypeName']="加息券";
-          this.setState({});   
-            //console.log(this.state)    
-           
-        }*/
-    //this.dispatch('getActivityInfo','activityName',0,this.state.ajaxdata);
-      //this.dispatch('fetch', 1231);
 
   
       this.dispatch('getDepartment',this.state.ajaxdata);
@@ -200,9 +186,13 @@ export default class Page extends Component {
                
                     ajaxdata["list"][index][prams]['value']=result                      
                     ajaxdata["list"][index][prams]['icon']=false
+                    if(prams!="applyNum"){
                     that.setState({ loaded:false,ajaxdata});   
                     //alert(JSON.stringify(ajaxdata))                  
                     that.dispatch('getActivityInfo',prams,index,that.state.ajaxdata);
+                  }else{
+                    that.setState({ajaxdata});  
+                  }
                     
                     
           }else{
@@ -249,6 +239,7 @@ export default class Page extends Component {
                       that.setState({ loaded:false,ajaxdata});
                       that.dispatch('getActivityId',that.state.ajaxdata);
                     }else if(prams=="rewardType"){
+
                   
                           if(result.key==5){
                              ajaxdata.reqType=2;
@@ -288,7 +279,7 @@ export default class Page extends Component {
   }
   //单张与批量选择
    handleChangeNum=(result)=> {
-    return false;
+    
 //this.dispatch('getActivityId',this.state.ajaxdata);
      var that = this;
     let ajaxdata={...this.state.ajaxdata}
@@ -336,6 +327,7 @@ export default class Page extends Component {
   addOneItem=(index)=>{
    
      let ajaxdata={...this.state.ajaxdata}
+
      if(!ajaxdata.department.value){
         message.warning('请选择部门');
         return false;
@@ -367,6 +359,68 @@ export default class Page extends Component {
      this.setState({ajaxdata});
     // console.log(ajaxdata.list)
   }
+    handleUploadChange = ({file,fileList},index) => {
+       let ajaxdata={...this.state.ajaxdata}
+
+  
+    if(file.status=="done"||file.status=="error"){
+
+
+            if(file.response){
+
+              if(file.response.code=="200"){
+               let photo={fileName:file.name,uploadUrl:file.response.data,uid:file.uid};
+
+                ajaxdata.list[index].photoList.push(photo)
+             
+             
+              }else{
+
+                 dd.device.notification.alert({
+                      message: file.response.message,
+                      title: "提示",//可传空
+                      buttonName: "确定",
+                      onSuccess : function() {
+                     
+                      },
+                      onFail : function(err) {}
+                  });      
+
+            
+                
+              }
+              }else{
+                 dd.device.notification.alert({
+                      message:"上传失败",
+                      title: "提示",//可传空
+                      buttonName: "确定",
+                      onSuccess : function() {
+                     
+                      },
+                      onFail : function(err) {}
+                  });      
+                   
+               
+              }
+            
+             
+          }else if(file.status=="removed"){
+
+            const temparr=ajaxdata.list[index].photoList.filter((item)=>{
+
+                return item.uid!==file.uid;
+             })  
+           ajaxdata.list[index].photoList=temparr;
+          
+          }else{
+             
+          }
+   
+ ajaxdata.list[index].fileList=fileList
+      this.setState({ ajaxdata }) 
+   
+   
+ }   
     submit=()=>{
       //逻辑判断提交条件
       let obj=this.state.ajaxdata;
@@ -377,8 +431,9 @@ export default class Page extends Component {
       //console.log(obj);
     //return false
      if(obj.reqType==1){
+      if(obj.SingleOrBatch.value.key==1){
 
-          if(!obj.department.value){
+        if(!obj.department.value){
             message.warning('请选择部门');
             
             return false;
@@ -423,6 +478,65 @@ export default class Page extends Component {
             
             return false;
           }
+
+      }else{
+
+       //批量发放
+       if(!obj.department.value){
+            message.warning('请选择部门');
+            
+            return false;
+          }
+          else if(!obj.activityName.value){
+            message.warning('请选择活动');
+            
+            return false;
+          }
+
+
+          for(let i=0;i<obj.list.length;i++){
+
+                if(!obj.list[i].interestLevel.value){
+                  message.warning('请选择金额');
+                 
+                  return false;
+                }
+                else if(!obj.list[i].minAmount.value){
+                  message.warning('请选择变现金额');
+                 
+                  return false;
+                }
+                else if(!obj.list[i].productDate.value){
+                  message.warning('请选择适用产品');
+                  
+                  return false;
+                }
+                else if(!obj.list[i].validityPeriod.value){
+                  message.warning('请选择有效期');                  
+                  return false;
+                }
+                else if(!obj.list[i].photoList.length){
+                  console.log(obj.list[i].photoList)
+                  message.warning('有附件未上传');                  
+                  return false;
+                }
+
+                }
+
+          if(obj.singledata.applyReason.default==""){
+            message.warning('请填写申请原因');            
+            return false;
+          }
+          
+
+             this.setState({loaded:false});
+             this.dispatch('submitBatch',this.state.ajaxdata);//批量上传
+              return false;
+            
+        
+      }
+
+          
       }else{
 
          obj.photoList=this.refs.CashChild.state.photoList;
@@ -451,7 +565,6 @@ export default class Page extends Component {
           }
 
       }
-
        this.setState({loaded:false});
        this.dispatch('submit',this.state.ajaxdata);
     }
@@ -483,13 +596,12 @@ export default class Page extends Component {
     };
 
     const t = this;
-
     //const { ajaxdata = {} } = t.state;
     //alert(JSON.stringify(t.state))
     if(t.state.ajaxdata.rewardType.value.key==3){
-      var Tag = t.state.ajaxdata.SingleOrBatch.value.value==1 ? InterestSingle : InterestBatch;//模板名称也可以根据数据变更,模板名称是只读属性，在渲染时定义
+      var Tag = t.state.ajaxdata.SingleOrBatch.value.key==1 ? InterestSingle : InterestBatch;//模板名称也可以根据数据变更,模板名称是只读属性，在渲染时定义
     }else if(t.state.ajaxdata.rewardType.value.key==1){
-      var Tag = t.state.ajaxdata.SingleOrBatch.value.value==1 ? RedSingle : RedBatch;//模板名称也可以根据数据变更,模板名称是只读属性，在渲染时定义
+      var Tag = t.state.ajaxdata.SingleOrBatch.value.key==1 ? RedSingle : RedBatch;//模板名称也可以根据数据变更,模板名称是只读属性，在渲染时定义
     }else{
       var Tag =Cash
     }
@@ -501,33 +613,34 @@ export default class Page extends Component {
                     <Form style={{padding:30}}>                         
                        <FormItem {...formItemLayout} label="奖励类型" required> 
                           <Select  value={t.state.ajaxdata.rewardType.value}  labelInValue  onChange={(value)=>t.handleSelectAct(value,'rewardType')}>
-                          {t.state.ajaxdata.rewardType.source.map(d => <Option key={d.value}>{d.key}</Option>)}
+                          {t.state.ajaxdata.rewardType.source.map(d => <Option key={d.key}>{d.label}</Option>)}
                            </Select>      
                       </FormItem>
                         <FormItem {...formItemLayout} label="所选部门" required> 
                       
                          <Select allowClear  value={t.state.ajaxdata.department.value} labelInValue placeholder={t.state.ajaxdata.department.typetext}  onChange={(value)=>t.handleSelectAct(value,'department')}>
-                        {t.state.ajaxdata.department.source.map(d => <Option key={d.value}>{d.key}</Option>)}
+                        {t.state.ajaxdata.department.source.map(d => <Option key={d.key}>{d.label}</Option>)}
                            </Select> 
                       
                     </FormItem>
-                     <FormItem {...formItemLayout} label="所选活动" required> 
-                          <Select  value={t.state.ajaxdata.activityName.value} allowClear labelInValue placeholder={t.state.ajaxdata.activityName.typetext}  onChange={(value)=>t.handleSelectAct(value,'activityName')}>
-                          {t.state.ajaxdata.activityName.source.map(d => <Option key={d.value}>{d.key}</Option>)}
-                           </Select>      
-                      </FormItem>
-
-                       {t.state.ajaxdata.rewardType.value.key!=5 ? (
+                    {t.state.ajaxdata.rewardType.value.key!=5 ? (
                        <FormItem {...formItemLayout} label="发放类型" required>                     
                           <Select  value={t.state.ajaxdata.SingleOrBatch.value} labelInValue placeholder={t.state.ajaxdata.SingleOrBatch.typetext}  onChange={(value)=>t.handleChangeNum(value)}>
-                          {t.state.ajaxdata.SingleOrBatch.source.map(d => <Option key={d.value}>{d.key}</Option>)}
+                          {t.state.ajaxdata.SingleOrBatch.source.map(d => <Option key={d.key}>{d.label}</Option>)}
                          </Select>        
                        </FormItem>
                         ):null}
+                     <FormItem {...formItemLayout} label="所选活动" required> 
+                          <Select  value={t.state.ajaxdata.activityName.value} allowClear labelInValue placeholder={t.state.ajaxdata.activityName.typetext}  onChange={(value)=>t.handleSelectAct(value,'activityName')}>
+                          {t.state.ajaxdata.activityName.source.map(d => <Option key={d.key}>{d.label}</Option>)}
+                           </Select>      
+                      </FormItem>
+
+                       
 
               
-                   <Tag ref="CashChild" parentuserInfo={t.state.ajaxdata.singledata}  arr={t.state.ajaxdata.list} parenthandleTextChange={t.handleTextChange} parentdelOneItem={t.delOneItem} parenthandleSelectCommon={t.handleSelectCommon} />
-                      {t.state.ajaxdata.SingleOrBatch.value.value!=1 ? (
+                   <Tag ref="CashChild" parentuserInfo={t.state.ajaxdata.singledata}  arr={t.state.ajaxdata.list} parenthandleTextChange={t.handleTextChange} parentdelOneItem={t.delOneItem} parenthandleSelectCommon={t.handleSelectCommon} parenthandleUploadChange={t.handleUploadChange} />
+                      {t.state.ajaxdata.SingleOrBatch.value.key!=1&&t.state.ajaxdata.list.length<7 ? (
                         <Row>
                         <Col offset={4} span={20} style={{paddingBottom:20}}> <div onClick={()=>t.addOneItem()}  style={{color:'#09c',corsor:"pointer"}}>{t.state.ajaxdata.rewardType.value.key==3 ?"增加加息券":"增加红包"}+</div></Col>
                         </Row>
