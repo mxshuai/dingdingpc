@@ -208,7 +208,7 @@ export default {
           totaldata.validityDays=ajaxdata.list[0].validityPeriod.value.key;
           //totaldata.upperserialnumber="075e2d3034e83facb03b30843e74f952";//钉钉流水号
           totaldata.upperserialnumber=ajaxdata.dingcode;//钉钉流水号
-          totaldata.count=1;//申请张数
+          totaldata.count=ajaxdata.list[0].applyNum.value.key;//申请张数
       }else{
           totaldata.applyDeptName=ajaxdata.department.value.label;//申请部门名称（中文）
           totaldata.activityName=ajaxdata.activityName.value.label;//所选活动名称（中文）
@@ -220,7 +220,7 @@ export default {
           totaldata.auditImgUrl=ajaxdata.photoList[0].url;//申请原因
           totaldata.description=ajaxdata.singledata.applyReason.default;//申请原因                   
           totaldata.upperserialnumber=ajaxdata.dingcode;//钉钉流水号
-          totaldata.count=1;//申请张数
+          totaldata.count=ajaxdata.list[0].applyNum.value.key;//申请张数
       }
     //const totaldata={"activityId":"206","rewardId":750,"type":"1","mobile":"111111","applyUser":"aaaaaa",
     //"balance":"1","activateBalance":"100","realizationPro":",y30,y90,y180,y365,tc30,tc90,yp1,yp3,yp6,yp12,",

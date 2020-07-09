@@ -74,8 +74,10 @@ const Option = Select.Option;
                                                   </Select>   
                                                   </FormItem>
                                                   
-                                                  <FormItem {...formItemLayout} label="申请张数">  
-                                                     <Input  disabled value="1张"/>       
+                                <FormItem {...formItemLayout} label="申请张数"  required>  
+                                <Select value={item.applyNum.value} labelInValue placeholder={item.applyNum.typetext}  onChange={(value)=>t.props.parenthandleSelectCommon(value,'applyNum',index)}>
+                                {item.applyNum.source.map(d => <Option key={d.key}>{d.label}</Option>)}
+                                </Select>   
                                                     </FormItem>
                                                     <FormItem {...formItemLayout} label="客户注册手机号" required>  
 
